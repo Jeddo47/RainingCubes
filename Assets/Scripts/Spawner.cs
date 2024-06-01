@@ -3,8 +3,6 @@ using UnityEngine.Pool;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Painter _painter;
-    [SerializeField] private GameObject _cubePrefab;
     [SerializeField] private float _spawnPointY = 20;
     [SerializeField] private float _minSpawnPointX = -9;
     [SerializeField] private float _maxSpawnPointX = 9;
@@ -13,6 +11,9 @@ public class Spawner : MonoBehaviour
     [SerializeField] private float _spawnRate = 1;
     [SerializeField] private int _poolCapacity = 10;
     [SerializeField] private int _poolMaxSize = 10;
+    [SerializeField] private int _delay = 1;
+    [SerializeField] private Material _material;
+    [SerializeField] private Mesh _mesh;
 
     private ObjectPool<GameObject> _pool;
 
@@ -23,7 +24,7 @@ public class Spawner : MonoBehaviour
             if (cubeStats.DidCollisionHappen == false)
             {
                 cubeStats.ChangeCollisionStatus();
-                _painter.PaintCube(collision.gameObject);
+                cubeStats.ChangeColor();
                 cubeStats.StartCoroutine();
             }
         }
@@ -36,8 +37,19 @@ public class Spawner : MonoBehaviour
 
     private void Awake()
     {
+        GameObject cube = new GameObject("Cube");
+        MeshFilter filter = cube.AddComponent<MeshFilter>();
+        filter.mesh = _mesh;
+        cube.AddComponent<MeshRenderer>();
+        cube.GetComponent<Renderer>().material = _material;
+        cube.AddComponent<BoxCollider>();
+        cube.AddComponent<Rigidbody>();
+        CubeStats cubeStats = cube.AddComponent<CubeStats>();
+        cubeStats.Spawner = gameObject.GetComponent<Spawner>();
+        cube.transform.position = new Vector3(Random.Range(_minSpawnPointX, _maxSpawnPointX), _spawnPointY, Random.Range(_minSpawnPointZ, _maxSpawnPointZ));
+
         _pool = new ObjectPool<GameObject>(
-            createFunc: () => Instantiate(_cubePrefab),
+            createFunc: () => Instantiate(cube),
             actionOnGet: (obj) => ActionOnGet(obj),
             actionOnRelease: (obj) => obj.SetActive(false),
             actionOnDestroy: (obj) => Destroy(obj),
@@ -48,7 +60,6 @@ public class Spawner : MonoBehaviour
 
     private void ActionOnGet(GameObject obj)
     {
-        _painter.ResetToDefaultColor(obj);
         obj.transform.position = new Vector3(Random.Range(_minSpawnPointX, _maxSpawnPointX), _spawnPointY, Random.Range(_minSpawnPointZ, _maxSpawnPointZ));
         obj.GetComponent<Rigidbody>().velocity = Vector3.zero;
         obj.SetActive(true);
@@ -56,7 +67,7 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        InvokeRepeating(nameof(GetCube), 0, _spawnRate);
+        InvokeRepeating(nameof(GetCube), _delay, _spawnRate);
     }
 
     private void GetCube()
