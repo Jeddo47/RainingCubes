@@ -1,47 +1,44 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 public class CubeStats : MonoBehaviour
 {
+    public static Action<CubeStats> LifeSpanEnded;
+
     [SerializeField] private float _minLifespan = 2;
     [SerializeField] private float _maxLifespan = 5;
     [SerializeField] private Color _cubeColor = Color.white;
-    private Renderer CubeRenderer;
-
-    public Spawner Spawner;
-
-    public bool DidCollisionHappen { get; private set; }    
-
-    public void ChangeCollisionStatus()
-    {
-        DidCollisionHappen = true;
-    }
-
-    public void StartCoroutine()
-    {
-        StartCoroutine(nameof(CountLifeSpan));
-    }
-
-    public void ChangeColor()
-    {
-        CubeRenderer.material.color = new Color(Random.value, Random.value, Random.value);
-    }        
+    private Renderer _cubeRenderer;
+    private Spawner _spawner;
+    private bool _didCollisionHappen; 
 
     private void Awake()
     {
-        CubeRenderer = gameObject.GetComponent<Renderer>();
+        _cubeRenderer = gameObject.GetComponent<Renderer>();
+        _spawner = GameObject.FindObjectOfType<Spawner>();
     }
 
     private void OnEnable()
     {
-        CubeRenderer.material.color = _cubeColor;
-        DidCollisionHappen = false;
+        _cubeRenderer.material.color = _cubeColor;
+        _didCollisionHappen = false;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (_didCollisionHappen == false)
+        {
+            _didCollisionHappen = true;
+            _cubeRenderer.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+            StartCoroutine(nameof(CountLifeSpan));
+        }
     }
 
     private IEnumerator CountLifeSpan()
     {
-        yield return new WaitForSeconds(Random.Range(_minLifespan, _maxLifespan));
+        yield return new WaitForSeconds(UnityEngine.Random.Range(_minLifespan, _maxLifespan));
 
-        Spawner.ReleaseCube(gameObject);
+        LifeSpanEnded?.Invoke(this);
     }
 }

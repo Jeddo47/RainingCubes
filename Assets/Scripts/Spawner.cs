@@ -12,50 +12,40 @@ public class Spawner : MonoBehaviour
     [SerializeField] private int _poolCapacity = 10;
     [SerializeField] private int _poolMaxSize = 10;
     [SerializeField] private int _delay = 1;
-    [SerializeField] private Material _material;
-    [SerializeField] private Mesh _mesh;
+    [SerializeField] private GameObject _cube;
 
-    private ObjectPool<GameObject> _pool;
-
-    public void ChangeCubeOnCollision(Collision collision)
-    {
-        if (collision.gameObject.TryGetComponent<CubeStats>(out CubeStats cubeStats))
-        {
-            if (cubeStats.DidCollisionHappen == false)
-            {
-                cubeStats.ChangeCollisionStatus();
-                cubeStats.ChangeColor();
-                cubeStats.StartCoroutine();
-            }
-        }
-    }
-
-    public void ReleaseCube(GameObject gameObject)
-    {
-        _pool.Release(gameObject);
-    }
+    private ObjectPool<CubeStats> _pool;
 
     private void Awake()
     {
-        GameObject cube = new GameObject("Cube");
-        MeshFilter filter = cube.AddComponent<MeshFilter>();
-        filter.mesh = _mesh;
-        cube.AddComponent<MeshRenderer>();
-        cube.GetComponent<Renderer>().material = _material;
-        cube.AddComponent<BoxCollider>();
-        cube.AddComponent<Rigidbody>();
-        CubeStats cubeStats = cube.AddComponent<CubeStats>();
-        cubeStats.Spawner = gameObject.GetComponent<Spawner>();
-        cube.transform.position = new Vector3(Random.Range(_minSpawnPointX, _maxSpawnPointX), _spawnPointY, Random.Range(_minSpawnPointZ, _maxSpawnPointZ));
-
-        _pool = new ObjectPool<GameObject>(
-            createFunc: () => Instantiate(cube),
-            actionOnGet: (obj) => ActionOnGet(obj),
-            actionOnRelease: (obj) => obj.SetActive(false),
+        _pool = new ObjectPool<CubeStats>(
+            createFunc: () => Instantiate(_cube.GetComponent<CubeStats>()),
+            actionOnGet: (obj) => ActionOnGet(obj.gameObject),
+            actionOnRelease: (obj) => obj.gameObject.SetActive(false),
             actionOnDestroy: (obj) => Destroy(obj),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
-            maxSize: _poolMaxSize);
+            maxSize: _poolMaxSize);        
+    }
+
+    private void OnEnable()
+    {
+        CubeStats.LifeSpanEnded += ReleaseCube;
+    }
+
+    private void Start()
+    {
+        InvokeRepeating(nameof(GetCube), _delay, _spawnRate);
+    }
+
+    private void OnDisable()
+    {
+        CubeStats.LifeSpanEnded -= ReleaseCube;
+    }
+
+    public void ReleaseCube(CubeStats cubeStats)
+    {
+        _pool.Release(cubeStats);
     }
 
     private void ActionOnGet(GameObject obj)
@@ -63,11 +53,6 @@ public class Spawner : MonoBehaviour
         obj.transform.position = new Vector3(Random.Range(_minSpawnPointX, _maxSpawnPointX), _spawnPointY, Random.Range(_minSpawnPointZ, _maxSpawnPointZ));
         obj.GetComponent<Rigidbody>().velocity = Vector3.zero;
         obj.SetActive(true);
-    }
-
-    private void Start()
-    {
-        InvokeRepeating(nameof(GetCube), _delay, _spawnRate);
     }
 
     private void GetCube()
