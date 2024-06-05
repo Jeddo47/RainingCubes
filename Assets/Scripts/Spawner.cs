@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -8,10 +9,9 @@ public class Spawner : MonoBehaviour
     [SerializeField] private float _maxSpawnPointX = 9;
     [SerializeField] private float _minSpawnPointZ = -9;
     [SerializeField] private float _maxSpawnPointZ = 9;
-    [SerializeField] private float _spawnRate = 1;
+    [SerializeField] private float _spawnDelay = 1;
     [SerializeField] private int _poolCapacity = 10;
     [SerializeField] private int _poolMaxSize = 10;
-    [SerializeField] private int _delay = 1;
     [SerializeField] private GameObject _cubePrefab;
     
     private ObjectPool<CubeStats> _pool;
@@ -20,7 +20,7 @@ public class Spawner : MonoBehaviour
     {
         _pool = new ObjectPool<CubeStats>(
             createFunc: () => Instantiate(_cubePrefab.GetComponent<CubeStats>()),
-            actionOnGet: (obj) => ActionOnGet(obj),
+            actionOnGet: (obj) => ActOnGet(obj),
             actionOnRelease: (obj) => obj.gameObject.SetActive(false),
             actionOnDestroy: (obj) => Destroy(obj),
             collectionCheck: true,
@@ -30,7 +30,7 @@ public class Spawner : MonoBehaviour
        
     private void Start()
     {
-        InvokeRepeating(nameof(GetCube), _delay, _spawnRate);
+        StartCoroutine(nameof(StartSpawning));        
     }
        
     public void ReleaseCube(CubeStats cubeStats)
@@ -40,10 +40,10 @@ public class Spawner : MonoBehaviour
         cubeStats.LifeSpanEnded -= ReleaseCube;
     }
 
-    private void ActionOnGet(CubeStats cubeStats)
+    private void ActOnGet(CubeStats cubeStats)
     {
         cubeStats.transform.position = new Vector3(Random.Range(_minSpawnPointX, _maxSpawnPointX), _spawnPointY, Random.Range(_minSpawnPointZ, _maxSpawnPointZ));
-        cubeStats.GetRigidbody().velocity = Vector3.zero;
+        cubeStats.CubeRigidbody.velocity = Vector3.zero;
         cubeStats.LifeSpanEnded += ReleaseCube;
         cubeStats.gameObject.SetActive(true);
     }
@@ -51,5 +51,17 @@ public class Spawner : MonoBehaviour
     private void GetCube()
     {
         _pool.Get();
+    }
+
+    private IEnumerator StartSpawning() 
+    {
+        WaitForSeconds wait = new WaitForSeconds(_spawnDelay);    
+
+        while (true) 
+        {
+            GetCube();
+
+            yield return wait;
+        }
     }
 }
