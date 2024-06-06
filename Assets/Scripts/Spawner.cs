@@ -12,17 +12,17 @@ public class Spawner : MonoBehaviour
     [SerializeField] private float _spawnDelay = 1;
     [SerializeField] private int _poolCapacity = 10;
     [SerializeField] private int _poolMaxSize = 10;
-    [SerializeField] private GameObject _cubePrefab;
+    [SerializeField] private CubeStats _cubeStats;
     
     private ObjectPool<CubeStats> _pool;
 
     private void Awake()
     {
         _pool = new ObjectPool<CubeStats>(
-            createFunc: () => Instantiate(_cubePrefab.GetComponent<CubeStats>()),
-            actionOnGet: (obj) => ActOnGet(obj),
-            actionOnRelease: (obj) => obj.gameObject.SetActive(false),
-            actionOnDestroy: (obj) => Destroy(obj),
+            createFunc: () => Instantiate(_cubeStats),
+            actionOnGet:OnGet,
+            actionOnRelease: (cubeStats) => cubeStats.gameObject.SetActive(false),
+            actionOnDestroy: (cubeStats) => Destroy(cubeStats),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize);        
@@ -40,7 +40,7 @@ public class Spawner : MonoBehaviour
         cubeStats.LifeSpanEnded -= ReleaseCube;
     }
 
-    private void ActOnGet(CubeStats cubeStats)
+    private void OnGet(CubeStats cubeStats)
     {
         cubeStats.transform.position = new Vector3(Random.Range(_minSpawnPointX, _maxSpawnPointX), _spawnPointY, Random.Range(_minSpawnPointZ, _maxSpawnPointZ));
         cubeStats.CubeRigidbody.velocity = Vector3.zero;

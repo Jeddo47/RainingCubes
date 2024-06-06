@@ -7,21 +7,19 @@ using UnityEngine;
 
 public class CubeStats : MonoBehaviour
 {
-    public event Action<CubeStats> LifeSpanEnded;
-
     [SerializeField] private float _minLifespan = 2;
     [SerializeField] private float _maxLifespan = 5;
     [SerializeField] private Color _cubeColor = Color.white;
     private Renderer _cubeRenderer;
-    private Spawner _spawner;
     private bool _didCollisionHappen;
+
+    public event Action<CubeStats> LifeSpanEnded;
 
     public Rigidbody CubeRigidbody { get; private set; }
 
     private void Awake()
     {
         _cubeRenderer = GetComponent<Renderer>();
-        _spawner = GameObject.FindObjectOfType<Spawner>();
         CubeRigidbody = GetComponent<Rigidbody>();
     }
 
@@ -40,7 +38,7 @@ public class CubeStats : MonoBehaviour
             StartCoroutine(nameof(CountLifeSpan));
         }
     }
-       
+
     private IEnumerator CountLifeSpan()
     {
         yield return new WaitForSeconds(UnityEngine.Random.Range(_minLifespan, _maxLifespan));

@@ -1348,7 +1348,7 @@ MonoBehaviour:
   _spawnDelay: 1
   _poolCapacity: 10
   _poolMaxSize: 10
-  _cubePrefab: {fileID: 2380151004928889245, guid: 9b62d553b642e344db7b9f69dce5f5c6, type: 3}
+  _cubeStats: {fileID: -4676536701112249751, guid: 9b62d553b642e344db7b9f69dce5f5c6, type: 3}
 --- !u!1 &5698196119435819985
 GameObject:
   m_ObjectHideFlags: 0
