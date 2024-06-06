@@ -2,8 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Renderer))]
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Renderer), typeof(Rigidbody))]
 
 public class CubeStats : MonoBehaviour
 {
@@ -31,7 +30,7 @@ public class CubeStats : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (_didCollisionHappen == false && collision.gameObject.TryGetComponent(out PlatformDetector platformDetector))
+        if (_didCollisionHappen == false && collision.gameObject.TryGetComponent(out Platform platformDetector))
         {
             _didCollisionHappen = true;
             _cubeRenderer.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);

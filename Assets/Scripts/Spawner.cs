@@ -30,7 +30,7 @@ public class Spawner : MonoBehaviour
        
     private void Start()
     {
-        StartCoroutine(nameof(StartSpawning));        
+        StartCoroutine(StartSpawning());        
     }
        
     public void ReleaseCube(CubeStats cubeStats)
