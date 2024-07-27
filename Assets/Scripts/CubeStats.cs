@@ -8,7 +8,8 @@ public class CubeStats : MonoBehaviour
 {
     [SerializeField] private float _minLifespan = 2;
     [SerializeField] private float _maxLifespan = 5;
-    [SerializeField] private Color _cubeColor = Color.white;
+
+    private Color _cubeColor = Color.white;
     private Renderer _cubeRenderer;
     private bool _didCollisionHappen;
 
@@ -19,7 +20,7 @@ public class CubeStats : MonoBehaviour
     private void Awake()
     {
         _cubeRenderer = GetComponent<Renderer>();
-        CubeRigidbody = GetComponent<Rigidbody>();
+        CubeRigidbody = GetComponent<Rigidbody>();        
     }
 
     private void OnEnable()
@@ -30,7 +31,7 @@ public class CubeStats : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (_didCollisionHappen == false && collision.gameObject.TryGetComponent(out Platform platformDetector))
+        if (_didCollisionHappen == false && collision.gameObject.TryGetComponent<Platform>(out _))
         {
             _didCollisionHappen = true;
             _cubeRenderer.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
