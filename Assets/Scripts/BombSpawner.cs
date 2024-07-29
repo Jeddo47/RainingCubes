@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class BombSpawner : GenericSpawner<BombStats>
@@ -7,48 +6,34 @@ public class BombSpawner : GenericSpawner<BombStats>
 
     private Vector3 _bombPosition;
 
-    public event Action CubesOnSceneChanged;
-
-    private void Awake()
-    {
-        DeclarePool();
-    }
-
     private void OnEnable()
     {
-        _cubeSpawner.CubeReleased += GetBomb;
+        _cubeSpawner.CubeReleased += SetBombPosition;
     }
 
     private void OnDisable()
     {
-        _cubeSpawner.CubeReleased -= GetBomb;
+        _cubeSpawner.CubeReleased -= SetBombPosition;
     }
 
     protected override void OnGet(BombStats bomb)
     {
         bomb.gameObject.SetActive(true);
         bomb.transform.position = _bombPosition;
-        bomb.BombExploded += ReleaseBomb;
-
-        CubesOnSceneChanged?.Invoke();
+        bomb.BombExploded += ReleaseObject;
     }
 
-    private void GetBomb(CubeStats cube)
+    protected override void ReleaseObject(BombStats bomb)
+    {
+        bomb.BombExploded -= ReleaseObject;
+
+        base.ReleaseObject(bomb);        
+    }
+
+    private void SetBombPosition(CubeStats cube)
     {
         _bombPosition = cube.transform.position;
 
-        Pool.Get();
-
-        CountActiveObjects();
-        CountObjects();
-    }
-
-    private void ReleaseBomb(BombStats bomb)
-    {
-        bomb.BombExploded -= ReleaseBomb;
-
-        Pool.Release(bomb);
-
-        CountActiveObjects();
+        GetObject();
     }
 }

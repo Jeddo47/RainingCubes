@@ -13,11 +13,6 @@ public class CubeSpawner : GenericSpawner<CubeStats>
 
     public event Action<CubeStats> CubeReleased;
 
-    private void Awake()
-    {
-        DeclarePool();
-    }
-
     private void Start()
     {
         StartCoroutine(StartSpawning());
@@ -28,27 +23,17 @@ public class CubeSpawner : GenericSpawner<CubeStats>
         cube.transform.position = new Vector3(UnityEngine.Random.Range(_minSpawnPointX, _maxSpawnPointX), _spawnPointY,
                                                    UnityEngine.Random.Range(_minSpawnPointZ, _maxSpawnPointZ));
         cube.CubeRigidbody.velocity = Vector3.zero;
-        cube.LifeSpanEnded += ReleaseCube;
+        cube.LifeSpanEnded += ReleaseObject;
         cube.gameObject.SetActive(true);
     }
 
-    private void ReleaseCube(CubeStats cubeStats)
+    protected override void ReleaseObject(CubeStats cube)
     {
-        CubeReleased?.Invoke(cubeStats);
+        CubeReleased?.Invoke(cube);
 
-        Pool.Release(cubeStats);
+        base.ReleaseObject(cube);
 
-        cubeStats.LifeSpanEnded -= ReleaseCube;
-
-        CountActiveObjects();
-    }
-
-    private void GetCube()
-    {
-        Pool.Get();
-
-        CountActiveObjects();
-        CountObjects();
+        cube.LifeSpanEnded -= ReleaseObject;
     }
 
     private IEnumerator StartSpawning()
@@ -57,7 +42,7 @@ public class CubeSpawner : GenericSpawner<CubeStats>
 
         while (true)
         {
-            GetCube();
+            GetObject();
 
             yield return wait;
         }
