@@ -13,15 +13,14 @@ public abstract class GenericSpawner<Type> : MonoBehaviour where Type : MonoBeha
 
     private float _objectsCreated = 0;
     private float _objectsOnScene = 0;
-
-    protected ObjectPool<Type> Pool;
+    private ObjectPool<Type> _pool;
 
     public event Action<TMP_Text, float> ObjectsOnSceneCountChanged;
     public event Action<TMP_Text, float> ObjectsCountChanged;
 
     private void Awake() 
     {
-        Pool = new ObjectPool<Type>(
+        _pool = new ObjectPool<Type>(
             createFunc: () => Instantiate(_prefabType),
             actionOnGet: OnGet,
             actionOnRelease: (prefabType) => prefabType.gameObject.SetActive(false),
@@ -35,14 +34,14 @@ public abstract class GenericSpawner<Type> : MonoBehaviour where Type : MonoBeha
 
     protected virtual void ReleaseObject(Type prefabType) 
     {
-        Pool.Release(prefabType);
+        _pool.Release(prefabType);
         
         CountActiveObjects();
     }
 
     protected virtual void GetObject() 
     {
-        Pool.Get();
+        _pool.Get();
 
         CountActiveObjects();
         CountObjects();
@@ -57,7 +56,7 @@ public abstract class GenericSpawner<Type> : MonoBehaviour where Type : MonoBeha
 
     protected void CountActiveObjects() 
     {
-        _objectsOnScene = Pool.CountActive;
+        _objectsOnScene = _pool.CountActive;
 
         ObjectsOnSceneCountChanged?.Invoke(_objectsOnSceneText, _objectsOnScene);            
     }
