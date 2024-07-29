@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class CubeSpawner : GenericSpawner<CubeStats>
@@ -11,26 +10,17 @@ public class CubeSpawner : GenericSpawner<CubeStats>
     [SerializeField] private float _minSpawnPointZ = -9;
     [SerializeField] private float _maxSpawnPointZ = 9;
     [SerializeField] private float _spawnDelay = 1;
-    [SerializeField] private TMP_Text _cubesCreated;
-    [SerializeField] private TMP_Text _cubesOnScene;
-
-    private float _createdCubesCount = 0;
 
     public event Action<CubeStats> CubeReleased;
 
     private void Awake()
     {
-        DeclarePool();               
-    }
-       
-    private void Start()
-    {
-        StartCoroutine(StartSpawning());        
+        DeclarePool();
     }
 
-    private void Update()
+    private void Start()
     {
-        _cubesOnScene.text = Pool.CountActive.ToString();
+        StartCoroutine(StartSpawning());
     }
 
     protected override void OnGet(CubeStats cube)
@@ -46,34 +36,30 @@ public class CubeSpawner : GenericSpawner<CubeStats>
     {
         CubeReleased?.Invoke(cubeStats);
 
-        Pool.Release(cubeStats);        
+        Pool.Release(cubeStats);
 
         cubeStats.LifeSpanEnded -= ReleaseCube;
+
+        CountActiveObjects();
     }
 
     private void GetCube()
     {
-        CountCubes();
-
         Pool.Get();
+
+        CountActiveObjects();
+        CountObjects();
     }
 
-    private IEnumerator StartSpawning() 
+    private IEnumerator StartSpawning()
     {
-        WaitForSeconds wait = new WaitForSeconds(_spawnDelay);    
+        WaitForSeconds wait = new WaitForSeconds(_spawnDelay);
 
-        while (true) 
+        while (true)
         {
             GetCube();
 
             yield return wait;
         }
-    }
-
-    private void CountCubes() 
-    {
-        _createdCubesCount++;
-
-        _cubesCreated.text = _createdCubesCount.ToString(); 
     }
 }

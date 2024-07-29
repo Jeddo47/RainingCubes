@@ -1,14 +1,13 @@
-using TMPro;
+using System;
 using UnityEngine;
 
 public class BombSpawner : GenericSpawner<BombStats>
 {
     [SerializeField] private CubeSpawner _cubeSpawner;
-    [SerializeField] private TMP_Text _bombsCreated;
-    [SerializeField] private TMP_Text _bombsOnScene;
 
     private Vector3 _bombPosition;
-    private float _createdBombsCount = 0;
+
+    public event Action CubesOnSceneChanged;
 
     private void Awake()
     {
@@ -18,11 +17,6 @@ public class BombSpawner : GenericSpawner<BombStats>
     private void OnEnable()
     {
         _cubeSpawner.CubeReleased += GetBomb;
-    }
-
-    private void Update()
-    {
-        _bombsOnScene.text = Pool.CountActive.ToString();
     }
 
     private void OnDisable()
@@ -35,15 +29,18 @@ public class BombSpawner : GenericSpawner<BombStats>
         bomb.gameObject.SetActive(true);
         bomb.transform.position = _bombPosition;
         bomb.BombExploded += ReleaseBomb;
+
+        CubesOnSceneChanged?.Invoke();
     }
 
     private void GetBomb(CubeStats cube)
     {
-        CountBombs();
-
         _bombPosition = cube.transform.position;
 
         Pool.Get();
+
+        CountActiveObjects();
+        CountObjects();
     }
 
     private void ReleaseBomb(BombStats bomb)
@@ -51,12 +48,7 @@ public class BombSpawner : GenericSpawner<BombStats>
         bomb.BombExploded -= ReleaseBomb;
 
         Pool.Release(bomb);
-    }
 
-    private void CountBombs() 
-    {
-        _createdBombsCount++;
-
-        _bombsCreated.text = _createdBombsCount.ToString();
+        CountActiveObjects();
     }
 }

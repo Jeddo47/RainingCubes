@@ -537,6 +537,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 228977489}
+  - component: {fileID: 228977490}
   m_Layer: 5
   m_Name: Statistics
   m_TagString: Untagged
@@ -568,6 +569,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &228977490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228977488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fadd76895831784f9ef0ee805b9d9ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cubeSpawner: {fileID: 5675004187994690781}
+  _bombSpawner: {fileID: 8506342428693344244}
 --- !u!1 &353311056
 GameObject:
   m_ObjectHideFlags: 0
@@ -2786,14 +2801,14 @@ MonoBehaviour:
   _prefabType: {fileID: -4676536701112249751, guid: 9b62d553b642e344db7b9f69dce5f5c6, type: 3}
   _poolCapacity: 10
   _poolMaxSize: 10
+  _objectsCreatedText: {fileID: 1068866621}
+  _objectsOnSceneText: {fileID: 156310535}
   _spawnPointY: 20
   _minSpawnPointX: -9
   _maxSpawnPointX: 9
   _minSpawnPointZ: -9
   _maxSpawnPointZ: 9
   _spawnDelay: 1
-  _cubesCreated: {fileID: 1068866621}
-  _cubesOnScene: {fileID: 156310535}
 --- !u!1 &5698196119435819985
 GameObject:
   m_ObjectHideFlags: 0
@@ -3299,9 +3314,9 @@ MonoBehaviour:
   _prefabType: {fileID: 4196774771890376268, guid: 64dcb645958748d468ae5e593d3d6e0b, type: 3}
   _poolCapacity: 10
   _poolMaxSize: 10
+  _objectsCreatedText: {fileID: 55812288}
+  _objectsOnSceneText: {fileID: 1042634183}
   _cubeSpawner: {fileID: 5675004187994690781}
-  _bombsCreated: {fileID: 55812288}
-  _bombsOnScene: {fileID: 1042634183}
 --- !u!4 &8804429163504140470
 Transform:
   m_ObjectHideFlags: 0
