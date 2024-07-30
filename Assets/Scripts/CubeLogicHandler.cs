@@ -4,28 +4,28 @@ using UnityEngine;
 
 [RequireComponent(typeof(Renderer), typeof(Rigidbody))]
 
-public class CubeStats : MonoBehaviour
+public class CubeLogicHandler : MonoBehaviour
 {
     [SerializeField] private float _minLifespan = 2;
     [SerializeField] private float _maxLifespan = 5;
 
-    private Color _cubeColor = Color.white;
-    private Renderer _cubeRenderer;
+    private Color _color = Color.white;
+    private Renderer _renderer;
     private bool _didCollisionHappen;
 
-    public event Action<CubeStats> LifeSpanEnded;
+    public event Action<CubeLogicHandler> LifeSpanEnded;
 
-    public Rigidbody CubeRigidbody { get; private set; }
+    public Rigidbody Rigidbody { get; private set; }
 
     private void Awake()
     {
-        _cubeRenderer = GetComponent<Renderer>();
-        CubeRigidbody = GetComponent<Rigidbody>();        
+        _renderer = GetComponent<Renderer>();
+        Rigidbody = GetComponent<Rigidbody>();        
     }
 
     private void OnEnable()
     {
-        _cubeRenderer.material.color = _cubeColor;
+        _renderer.material.color = _color;
         _didCollisionHappen = false;
     }
 
@@ -34,7 +34,7 @@ public class CubeStats : MonoBehaviour
         if (_didCollisionHappen == false && collision.gameObject.TryGetComponent<Platform>(out _))
         {
             _didCollisionHappen = true;
-            _cubeRenderer.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+            _renderer.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
             StartCoroutine(nameof(CountLifeSpan));
         }
     }

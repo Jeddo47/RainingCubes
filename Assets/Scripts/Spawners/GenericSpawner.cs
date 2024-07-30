@@ -8,15 +8,13 @@ public abstract class GenericSpawner<Type> : MonoBehaviour where Type : MonoBeha
     [SerializeField] private Type _prefabType;
     [SerializeField] private int _poolCapacity;
     [SerializeField] private int _poolMaxSize;
-    [SerializeField] private TMP_Text _objectsCreatedText;
-    [SerializeField] private TMP_Text _objectsOnSceneText;
 
     private float _objectsCreated = 0;
     private float _objectsOnScene = 0;
     private ObjectPool<Type> _pool;
 
-    public event Action<TMP_Text, float> ObjectsOnSceneCountChanged;
-    public event Action<TMP_Text, float> ObjectsCountChanged;
+    public event Action<float> ObjectsOnSceneCountChanged;
+    public event Action<float> ObjectsCountChanged;
 
     private void Awake() 
     {
@@ -51,13 +49,13 @@ public abstract class GenericSpawner<Type> : MonoBehaviour where Type : MonoBeha
     {
         _objectsCreated++;
 
-        ObjectsCountChanged?.Invoke(_objectsCreatedText, _objectsCreated);
+        ObjectsCountChanged?.Invoke(_objectsCreated);
     }
 
     protected void CountActiveObjects() 
     {
         _objectsOnScene = _pool.CountActive;
 
-        ObjectsOnSceneCountChanged?.Invoke(_objectsOnSceneText, _objectsOnScene);            
+        ObjectsOnSceneCountChanged?.Invoke(_objectsOnScene);            
     }
 }

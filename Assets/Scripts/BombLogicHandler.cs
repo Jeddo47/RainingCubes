@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BombStats : MonoBehaviour
+[RequireComponent(typeof(Renderer))]
+
+public class BombLogicHandler : MonoBehaviour
 {
     [SerializeField] private float _alphaChangeDelay;
     [SerializeField] private float _alphaChangeSpeed;
@@ -11,20 +13,20 @@ public class BombStats : MonoBehaviour
     [SerializeField] private float _explosionForce;
     [SerializeField] private float _upwardsModifier;
 
-    private Color _bombColor = Color.black;
-    private Renderer _bombRenderer;
+    private Color _color = Color.black;
+    private Renderer _renderer;
     private float _minAlpha = 0;
 
-    public event Action<BombStats> BombExploded;
+    public event Action<BombLogicHandler> BombExploded;
 
     private void Awake()
     {
-        _bombRenderer = GetComponent<Renderer>();
+        _renderer = GetComponent<Renderer>();
     }
 
     private void OnEnable()
     {
-        _bombRenderer.material.color = _bombColor;
+        _renderer.material.color = _color;
         StartCoroutine(StartAlphaChange());
     }
 
@@ -33,12 +35,12 @@ public class BombStats : MonoBehaviour
         WaitForSeconds wait = new WaitForSeconds(_alphaChangeDelay);
         float alpha = 1;
 
-        while (_bombRenderer.material.color.a > _minAlpha)
+        while (_renderer.material.color.a > _minAlpha)
         {
             alpha = Mathf.MoveTowards(alpha, _minAlpha, _alphaChangeSpeed);
 
-            _bombRenderer.material.color = new Color(_bombRenderer.material.color.r, _bombRenderer.material.color.g,
-                                                     _bombRenderer.material.color.b, alpha);
+            _renderer.material.color = new Color(_renderer.material.color.r, _renderer.material.color.g,
+                                                     _renderer.material.color.b, alpha);
 
             yield return wait;
         }
@@ -66,7 +68,7 @@ public class BombStats : MonoBehaviour
 
         foreach (Collider hit in hits)
         {
-            if (hit.TryGetComponent<BombStats>(out _) || hit.TryGetComponent<CubeStats>(out _))
+            if (hit.TryGetComponent<BombLogicHandler>(out _) || hit.TryGetComponent<CubeLogicHandler>(out _))
             {
                 affectedObjects.Add(hit.GetComponent<Rigidbody>());
             }
